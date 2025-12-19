@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>R2G - Fortnite Cases</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #0d0d0f;
+      --accent-yellow: #facc15;
+      --festive-red: #ef4444;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-color);
+      color: #ffffff;
+      margin: 0;
+      overflow-x: hidden;
+    }
+    h1, h2, h3, h4, .font-gaming {
+      font-family: 'Rajdhani', sans-serif;
+    }
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0d0d0f;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #27272a;
+      border-radius: 10px;
+      border: 2px solid #0d0d0f;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #3f3f46;
+    }
+    
+    .glass {
+      background: rgba(255, 255, 255, 0.02);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .bg-blob {
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      filter: blur(120px);
+      z-index: -1;
+      opacity: 0.1;
+      pointer-events: none;
+    }
+    .blob-1 { background: #ef4444; top: -100px; left: -100px; }
+    .blob-2 { background: #3b82f6; bottom: -100px; right: -100px; }
+    
+    .text-glow-red {
+      text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+    }
+    
+    .vertical-text {
+      writing-mode: vertical-rl;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    .animate-float {
+      animation: float 4s ease-in-out infinite;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@19.0.0",
+    "react-dom": "https://esm.sh/react-dom@19.0.0",
+    "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
+    "lucide-react": "https://esm.sh/lucide-react@0.460.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/"
+  }
+}
+</script>
+</head>
+<body>
+  <div class="bg-blob blob-1"></div>
+  <div class="bg-blob blob-2"></div>
+  <div id="root"></div>
+
+  <script type="module">
+    import React, { useState, useEffect, useMemo } from 'react';
+    import ReactDOM from 'react-dom/client';
+    import { 
+      Settings, Menu, PlusCircle, Gift, Zap, ShieldCheck, ChevronRight, 
+      Twitter, Instagram, Youtube, Send, MessageSquare, Monitor, Users, 
+      Box, TrendingUp, Swords, Home, RotateCcw, Trophy, X, Check, HelpCircle, 
+      ChevronDown, User, Hash, RefreshCw, FileText, BookOpen, CreditCard
+    } from 'lucide-react';
+
+    // --- TYPES ---
+    const Rarity = {
+      COMMON: 'COMMON',
+      UNCOMMON: 'UNCOMMON',
+      RARE: 'RARE',
+      EPIC: 'EPIC',
+      LEGENDARY: 'LEGENDARY',
+      MYTHIC: 'MYTHIC'
+    };
+
+    // --- TRANSLATIONS ---
+    const translations = {
+      en: {
+        getFree: "Get Free",
+        giveaways: "Giveaways",
+        skinChanger: "Skin Changer",
+        upgrader: "Upgrader",
+        caseBattle: "Case Battle",
+        home: "Home",
+        battles: "Battles",
+        contracts: "Contracts",
+        leaderboard: "Leaderboard",
+        myAccount: "My Account",
+        affiliate: "Affiliate System",
+        useCode: "Use Code",
+        dailyCase: "Daily Case",
+        support: "Support",
+        blog: "Blog",
+        fairPlay: "Provably Fair",
+        loginGoogle: "Log in with Google",
+        winterVault: "THE WINTER VAULT IS OPEN",
+        eventCases: "EVENT CASES",
+        mainCases: "MAIN CASES",
+        hide: "HIDE",
+        dailyRewards: "DAILY REWARDS",
+        verifiedFair: "VERIFIED FAIR",
+        instantDelivery: "INSTANT DELIVERY",
+        enterEvent: "ENTER TO THE EVENT",
+        settingsTitle: "Update your settings",
+        settingsSubtitle: "Choose your preferred language and currency.",
+        save: "Save",
+        cancel: "Cancel",
+        language: "Language",
+        currency: "Currency",
+        accountCodes: "Account & Codes",
+        games: "Games",
+        other: "Other"
+      },
+      hi: {
+        getFree: "मुफ्त पाएं",
+        giveaways: "गिवअवे",
+        skinChanger: "स्किन चेंजर",
+        upgrader: "अपग्रेडर",
+        caseBattle: "केस बैटल",
+        home: "होम",
+        battles: "लड़ाइयां",
+        contracts: "अनुबंध",
+        leaderboard: "लीडरबोर्ड",
+        myAccount: "मेरा खाता",
+        affiliate: "एफिलिएट सिस्टम",
+        useCode: "कोड उपयोग करें",
+        dailyCase: "दैनिक केस",
+        support: "सहायता",
+        blog: "ब्लॉग",
+        fairPlay: "प्रमाणित निष्पक्ष",
+        loginGoogle: "गूगल से लॉगिन करें",
+        winterVault: "विंटर वॉल्ट खुला है",
+        eventCases: "इवेंट केस",
+        mainCases: "मुख्य केस",
+        hide: "छिपाएं",
+        dailyRewards: "दैनिक पुरस्कार",
+        verifiedFair: "सत्यापित निष्पक्ष",
+        instantDelivery: "तुरंत डिलीवरी",
+        enterEvent: "इवेंट में प्रवेश करें",
+        settingsTitle: "अपनी सेटिंग्स अपडेट करें",
+        settingsSubtitle: "अपनी पसंदीदा भाषा और मुद्रा चुनें।",
+        save: "सहेजें",
+        cancel: "रद्द करें",
+        language: "भाषा",
+        currency: "मुद्रा",
+        accountCodes: "खाता और कोड",
+        games: "खेल",
+        other: "अन्य"
+      }
+    };
+
+    // --- DATA ---
+    const FORTNITE_ITEMS = [
+      { id: 's1', name: 'Renegade Raider', rarity: Rarity.MYTHIC, image: 'https://fortnite-api.com/images/cosmetics/br/cid_028_athena_commando_f_retro/icon.png', price: 1500.00 },
+      { id: 's2', name: 'Black Knight', rarity: Rarity.LEGENDARY, image: 'https://fortnite-api.com/images/cosmetics/br/cid_035_athena_commando_m_medieval/icon.png', price: 850.00 },
+      { id: 's3', name: 'Crystal', rarity: Rarity.UNCOMMON, image: 'https://fortnite-api.com/images/cosmetics/br/cid_440_athena_commando_f_cyberpunk_c/icon.png', price: 15.00 },
+      { id: 's4', name: 'Aura', rarity: Rarity.UNCOMMON, image: 'https://fortnite-api.com/images/cosmetics/br/cid_407_athena_commando_f_treasurehunterfashion/icon.png', price: 12.00 },
+      { id: 's5', name: 'Midas', rarity: Rarity.LEGENDARY, image: 'https://fortnite-api.com/images/cosmetics/br/cid_694_athena_commando_m_goldenSkeleton/icon.png', price: 250.00 },
+      { id: 's6', name: 'Skull Trooper', rarity: Rarity.EPIC, image: 'https://fortnite-api.com/images/cosmetics/br/cid_030_athena_commando_m_halloween/icon.png', price: 400.00 },
+      { id: 's7', name: 'Travis Scott', rarity: Rarity.MYTHIC, image: 'https://fortnite-api.com/images/cosmetics/br/cid_733_athena_commando_m_cyclone/icon.png', price: 1200.00 },
+      { id: 's8', name: 'Drift', rarity: Rarity.LEGENDARY, image: 'https://fortnite-api.com/images/cosmetics/br/cid_161_athena_commando_m_drift/icon.png', price: 350.00 },
+      { id: 's9', name: 'Wildcat', rarity: Rarity.EPIC, image: 'https://fortnite-api.com/images/cosmetics/br/cid_889_athena_commando_f_skater_c/icon.png', price: 2000.00 },
+      { id: 's10', name: 'Galaxy', rarity: Rarity.MYTHIC, image: 'https://fortnite-api.com/images/cosmetics/br/cid_175_athena_commando_m_celestial/icon.png', price: 2500.00 },
+      { id: 's11', name: 'Ikonik', rarity: Rarity.EPIC, image: 'https://fortnite-api.com/images/cosmetics/br/cid_371_athena_commando_m_kpop/icon.png', price: 900.00 },
+      { id: 's12', name: 'Pink Ghoul', rarity: Rarity.LEGENDARY, image: 'https://fortnite-api.com/images/cosmetics/br/cid_029_athena_commando_f_halloween/icon.png', price: 1800.00 },
+    ];
+
+    const RARITY_COLORS = {
+      [Rarity.COMMON]: '#94a3b8',
+      [Rarity.UNCOMMON]: '#22c55e',
+      [Rarity.RARE]: '#3b82f6',
+      [Rarity.EPIC]: '#a855f7',
+      [Rarity.LEGENDARY]: '#f97316',
+      [Rarity.MYTHIC]: '#eab308'
+    };
+
+    const generateCases = (prefix, title, count) => {
+      return Array.from({ length: count }).map((_, i) => ({
+        id: `${prefix}-${i}`,
+        name: `${title} ${i + 1}`,
+        price: Math.floor(Math.random() * 200) + 1,
+        image: FORTNITE_ITEMS[Math.floor(Math.random() * FORTNITE_ITEMS.length)].image,
+        items: [FORTNITE_ITEMS[0]]
+      }));
+    };
+
+    const OG_LEGENDS_CASES = generateCases('og', 'LEGEND', 8);
+    const SWEATY_SKINS_CASES = generateCases('sw', 'SWEAT', 8);
+    const MYTHIC_VAULT_CASES = generateCases('mv', 'MYTHIC', 8);
+    const PICKAXE_FRENZY_CASES = generateCases('pf', 'AXE', 8);
+    const EMOTE_PACK_CASES = generateCases('ep', 'DANCE', 8);
+
+    // --- COMPONENTS ---
+
+    const Navbar = ({ onOpenSettings, onOpenMenu, isLoggedIn, onLogin, currentLang, onSetView }) => {
+      const t = translations[currentLang] || translations.en;
+      return (
+        <nav className="sticky top-0 z-50 h-20 bg-[#0d0d0f]/90 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-8">
+          <div className="flex items-center gap-10">
+            <button onClick={() => onSetView('home')} className="flex items-center gap-2 shrink-0 group relative">
+              <img src="https://i.ibb.co/d4HMs3Bm/image.png" alt="R2G" className="h-10 w-auto transition-transform group-hover:scale-110" />
+              <span className="font-gaming text-2xl font-black tracking-tighter text-white">R2G</span>
+            </button>
+            <div className="hidden lg:flex items-center gap-8 text-[11px] font-black uppercase tracking-[0.15em] text-zinc-500">
+              <button onClick={() => onSetView('free')} className="flex items-center gap-2 hover:text-white transition-colors"><PlusCircle className="w-3.5 h-3.5" /> {t.getFree}</button>
+              <button onClick={() => onSetView('giveaways')} className="hover:text-white transition-colors">{t.giveaways}</button>
+              <button onClick={() => onSetView('skin-changer')} className="hover:text-white transition-colors">{t.skinChanger}</button>
+              <button onClick={() => onSetView('upgrader')} className="hover:text-white transition-colors">{t.upgrader}</button>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            {isLoggedIn ? (
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 bg-zinc-900 rounded-2xl pl-5 pr-1 py-1.5 border border-white/5 shadow-inner">
+                  <span className="text-sm font-black text-yellow-500">$1,240.50</span>
+                  <button className="bg-yellow-500 hover:bg-yellow-400 text-black rounded-xl p-2 transition-all shadow-lg shadow-yellow-500/10">
+                    <PlusCircle className="w-4 h-4" />
+                  </button>
+                </div>
+                <div onClick={() => onSetView('account')} className="w-11 h-11 rounded-2xl bg-zinc-800 border border-zinc-700 p-0.5 cursor-pointer hover:border-zinc-500 transition-all">
+                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Lucky" className="w-full h-full rounded-[14px]" alt="Profile" />
+                </div>
+              </div>
+            ) : (
+              <button onClick={onLogin} className="flex items-center gap-2 border border-green-500/40 bg-green-500/10 hover:bg-green-500/20 text-green-500 px-6 py-2.5 rounded-2xl text-xs font-black uppercase transition-all tracking-wider shadow-lg shadow-green-500/5">
+                <img src="https://www.google.com/favicon.ico" className="w-4 h-4 brightness-150" alt="G" />
+                {t.loginGoogle}
+              </button>
+            )}
+            <div className="flex gap-2">
+              <button onClick={onOpenSettings} className="p-3 bg-zinc-900 rounded-2xl border border-white/5 text-zinc-400 hover:text-white transition-all"><Settings className="w-5 h-5" /></button>
+              <button onClick={onOpenMenu} className="p-3 bg-zinc-900 rounded-2xl border border-white/5 text-zinc-400 hover:text-white transition-all"><Menu className="w-5 h-5" /></button>
+            </div>
+          </div>
+        </nav>
+      );
+    };
+
+    const LiveDrops = () => {
+      const [drops, setDrops] = useState([]);
+      useEffect(() => {
+        const initialDrops = Array.from({ length: 20 }).map((_, i) => ({
+          id: `drop-${i}`,
+          user: `Player${Math.floor(Math.random() * 999)}`,
+          item: FORTNITE_ITEMS[Math.floor(Math.random() * FORTNITE_ITEMS.length)],
+        }));
+        setDrops(initialDrops);
+        const interval = setInterval(() => {
+          setDrops(prev => [{
+            id: `drop-${Date.now()}`,
+            user: `Player${Math.floor(Math.random() * 999)}`,
+            item: FORTNITE_ITEMS[Math.floor(Math.random() * FORTNITE_ITEMS.length)],
+          }, ...prev.slice(0, 19)]);
+        }, 3000);
+        return () => clearInterval(interval);
+      }, []);
+      return (
+        <div className="h-28 bg-[#0a0a0c] border-b border-white/5 overflow-hidden relative flex items-center">
+          <div className="flex items-center gap-3 px-6 whitespace-nowrap overflow-x-auto no-scrollbar">
+            {drops.map((drop) => (
+              <div key={drop.id} className="flex-shrink-0 w-24 h-24 glass rounded-lg flex flex-col items-center justify-center p-2 group transition-transform hover:scale-105 relative" style={{ borderBottom: `2px solid ${RARITY_COLORS[drop.item.rarity]}` }}>
+                <img src={drop.item.image} alt={drop.item.name} className="w-12 h-12 object-contain" />
+                <span className="text-[10px] text-zinc-500 mt-1 truncate w-full text-center">{drop.user}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    };
+
+    const Sidebar = ({ currentView, onSetView }) => {
+      const menuItems = [
+        { icon: Home, label: 'home', id: 'home' },
+        { icon: Swords, label: 'battles', id: 'battles' },
+        { icon: TrendingUp, label: 'upgrader', id: 'upgrader' },
+        { icon: RotateCcw, label: 'contracts', id: 'contracts' },
+        { icon: Gift, label: 'free', id: 'free' },
+        { icon: Trophy, label: 'leaderboard', id: 'leaderboard' },
+      ];
+      return (
+        <aside className="hidden lg:flex flex-col w-[88px] h-[calc(100vh-80px)] bg-[#0d0d0f] border-r border-white/5 sticky top-20 shrink-0 py-8 px-2 items-center">
+          {menuItems.map((item) => {
+            const isActive = currentView === item.id;
+            return (
+              <button key={item.id} onClick={() => onSetView(item.id)} className={`w-16 h-16 flex items-center justify-center rounded-[24px] mb-3 transition-all ${isActive ? 'bg-yellow-500/10 border border-yellow-500/40 text-yellow-500' : 'text-zinc-600 hover:text-zinc-300'}`}>
+                <item.icon className={`w-7 h-7 ${isActive ? 'scale-110' : ''}`} />
+              </button>
+            );
+          })}
+        </aside>
+      );
+    };
+
+    const Hero = ({ currentLang }) => {
+      const t = translations[currentLang] || translations.en;
+      return (
+        <div className="px-8 pt-8">
+          <div className="relative w-full h-[540px] rounded-[52px] overflow-hidden shadow-2xl bg-[#141416] border border-white/5 flex items-center">
+            <img src="https://i.ibb.co/rR9LrXYH/Chat-GPT-Image-Dec-19-2025-07-04-05-PM.png" alt="Hero" className="absolute inset-0 w-full h-full object-cover brightness-[0.4]" />
+            <div className="relative z-10 px-16 max-w-3xl">
+              <div className="inline-flex bg-red-600 text-white px-5 py-2 rounded-full text-[11px] font-black tracking-widest mb-6">CHRISTMAS SPECIAL</div>
+              <h1 className="text-[100px] font-gaming font-black text-white mb-6 uppercase leading-[0.8] italic tracking-tighter">
+                {t.winterVault.split(' ')[0]} <br />
+                <span className="text-red-500 text-glow-red">{t.winterVault.split(' ').slice(1).join(' ')}</span>
+              </h1>
+              <p className="text-zinc-400 text-xl font-medium mb-12 max-w-lg leading-relaxed">{t.dailyRewards}</p>
+              <button className="bg-red-600 hover:bg-red-500 text-white px-16 py-6 rounded-[32px] font-black text-sm uppercase transition-all flex items-center gap-3">
+                {t.enterEvent} <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    const CaseCard = ({ caseData, onClick }) => (
+      <div onClick={onClick} className="group cursor-pointer bg-[#141416]/40 border border-white/5 rounded-[32px] p-8 relative overflow-hidden transition-all hover:bg-[#1a1a1e]/80">
+        <div className="flex flex-col items-center">
+          <div className="w-full aspect-square mb-8 relative">
+            <img src={caseData.image} alt={caseData.name} className="w-full h-full object-contain drop-shadow-2xl transition-transform group-hover:scale-110" />
+          </div>
+          <h3 className="font-gaming text-2xl font-black text-white mb-3 uppercase italic">{caseData.name}</h3>
+          <div className="bg-zinc-900 px-6 py-2.5 rounded-2xl group-hover:bg-yellow-500 group-hover:text-black transition-all">
+            <span className="text-base font-black">${caseData.price.toFixed(2)}</span>
+          </div>
+        </div>
+      </div>
+    );
+
+    const CaseGrid = ({ currentLang }) => {
+      const t = translations[currentLang] || translations.en;
+      const sections = [
+        { title: 'OG LEGENDS', cases: OG_LEGENDS_CASES },
+        { title: 'SWEATY SKINS', cases: SWEATY_SKINS_CASES },
+        { title: 'MYTHIC VAULT', cases: MYTHIC_VAULT_CASES },
+        { title: 'PICKAXE FRENZY', cases: PICKAXE_FRENZY_CASES },
+        { title: 'EMOTE PACK', cases: EMOTE_PACK_CASES },
+      ];
+      return (
+        <div className="px-8 pb-20 mt-12 space-y-24">
+          <div className="flex items-center justify-between">
+            <h2 className="text-4xl font-gaming font-black uppercase italic tracking-tight">{t.mainCases}</h2>
+          </div>
+          {sections.map((section, idx) => (
+            <section key={idx}>
+              <div className="flex items-center gap-6 mb-10 text-2xl font-gaming font-black text-white italic">
+                {section.title} <div className="h-px flex-1 bg-white/5" />
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-6">
+                {section.cases.map(c => <CaseCard key={c.id} caseData={c} onClick={() => {}} />)}
+              </div>
+            </section>
+          ))}
+        </div>
+      );
+    };
+
+    const NavigationMenu = ({ isOpen, onClose, onLogin, isLoggedIn, currentLang, onSetView }) => {
+      if (!isOpen) return null;
+      const t = translations[currentLang] || translations.en;
+      return (
+        <div className="fixed inset-0 z-[130] bg-[#0d0d0f]/95 backdrop-blur-xl p-12 overflow-y-auto animate-in fade-in">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex justify-end mb-12">
+              <button onClick={onClose} className="p-3 bg-zinc-900 rounded-xl"><X className="text-white" /></button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
+              <section>
+                <h3 className="text-zinc-600 font-bold text-xs tracking-widest mb-8">ACCOUNT</h3>
+                <div className="space-y-4">
+                  <button onClick={() => {onSetView('account'); onClose();}} className="w-full text-left p-4 bg-zinc-900 rounded-xl hover:bg-zinc-800 transition-colors">ACCOUNT</button>
+                  <button onClick={() => {onSetView('support'); onClose();}} className="w-full text-left p-4 bg-zinc-900 rounded-xl hover:bg-zinc-800 transition-colors">SUPPORT</button>
+                </div>
+              </section>
+              <section className="md:col-span-2">
+                <h3 className="text-zinc-600 font-bold text-xs tracking-widest mb-8">GAMES</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  {['Battles', 'Upgrader', 'Changer', 'Contracts', 'Giveaways'].map(game => (
+                    <button key={game} onClick={() => {onSetView(game.toLowerCase()); onClose();}} className="p-6 bg-zinc-900 rounded-2xl hover:bg-zinc-800 transition-all font-bold uppercase">{game}</button>
+                  ))}
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    const SettingsModal = ({ isOpen, onClose, currentLang, onSetLang }) => {
+      if (!isOpen) return null;
+      const t = translations[currentLang] || translations.en;
+      return (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-[#16161a] w-full max-w-lg rounded-3xl border border-white/10 p-8 shadow-2xl">
+            <div className="flex justify-between mb-8">
+              <h2 className="text-2xl font-gaming font-bold uppercase tracking-wide">SETTINGS</h2>
+              <button onClick={onClose}><X /></button>
+            </div>
+            <div className="space-y-8">
+              <div>
+                <label className="text-xs font-black text-zinc-500 uppercase tracking-widest mb-4 block">Language</label>
+                <div className="grid grid-cols-2 gap-3">
+                  {[{c:'en', n:'English'}, {c:'hi', n:'Hindi'}].map(l => (
+                    <button key={l.c} onClick={() => onSetLang(l.c)} className={`p-4 rounded-xl border ${currentLang === l.c ? 'border-yellow-500 bg-yellow-500/5' : 'border-white/5 bg-[#0d0d0f]'}`}>{l.n}</button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <button onClick={onClose} className="w-full mt-10 py-4 bg-yellow-500 text-black font-black rounded-xl">SAVE</button>
+          </div>
+        </div>
+      );
+    };
+
+    const App = () => {
+      const [view, setView] = useState('home');
+      const [isLoggedIn, setIsLoggedIn] = useState(false);
+      const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+      const [isMenuOpen, setIsMenuOpen] = useState(false);
+      const [lang, setLang] = useState('en');
+      const [stats, setStats] = useState({ online: 6807, users: 13737728, cases: 546998827, upgrades: 166007649, battles: 51335488 });
+
+      useEffect(() => {
+        const t = setInterval(() => {
+          setStats(p => ({
+            online: p.online + (Math.random() > 0.5 ? 1 : -1) * Math.floor(Math.random() * 5),
+            users: p.users + (Math.random() > 0.8 ? 1 : 0),
+            cases: p.cases + Math.floor(Math.random() * 3),
+            upgrades: p.upgrades + (Math.random() > 0.4 ? 1 : 0),
+            battles: p.battles + (Math.random() > 0.7 ? 1 : 0)
+          }));
+        }, 2000);
+        return () => clearInterval(t);
+      }, []);
+
+      const f = (n) => new Intl.NumberFormat().format(n);
+
+      return (
+        <div className="min-h-screen bg-[#0d0d0f] flex flex-col">
+          <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} currentLang={lang} onSetLang={setLang} />
+          <NavigationMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} onLogin={() => setIsLoggedIn(true)} isLoggedIn={isLoggedIn} currentLang={lang} onSetView={setView} />
+          <LiveDrops />
+          <Navbar onOpenSettings={() => setIsSettingsOpen(true)} onOpenMenu={() => setIsMenuOpen(true)} isLoggedIn={isLoggedIn} onLogin={() => setIsLoggedIn(true)} currentLang={lang} onSetView={setView} />
+          
+          <div className="flex flex-1 relative">
+            <Sidebar currentView={view} onSetView={setView} />
+            <main className="flex-1 overflow-y-auto">
+              <div className="max-w-full mx-auto">
+                {view === 'home' ? (
+                  <>
+                    <Hero currentLang={lang} />
+                    <CaseGrid currentLang={lang} />
+                  </>
+                ) : (
+                  <div className="p-20 text-center text-7xl font-gaming font-black uppercase text-white italic">{view} COMING SOON</div>
+                )}
+
+                {/* Statistics */}
+                <div className="w-full bg-[#0d0d0f] border-y border-white/5 py-16 mt-32">
+                  <div className="max-w-[1920px] mx-auto px-12 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-12 text-center">
+                    {[
+                      { l: 'Online', v: stats.online, c: 'text-green-500', i: Monitor },
+                      { l: 'Users', v: stats.users, c: 'text-blue-500', i: Users },
+                      { l: 'Opened Cases', v: stats.cases, c: 'text-yellow-500', i: Box },
+                      { l: 'Upgrades', v: stats.upgrades, c: 'text-purple-500', i: TrendingUp },
+                      { l: 'Battles', v: stats.battles, c: 'text-red-500', i: Swords },
+                    ].map((s, idx) => (
+                      <div key={idx} className="flex flex-col items-center">
+                        <div className={`p-4 rounded-2xl bg-white/5 mb-4 ${s.c}`}><s.i size={24} /></div>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600 mb-1">{s.l}</span>
+                        <span className="text-3xl font-gaming font-black italic">{f(s.v)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Footer */}
+                <footer className="border-t border-white/5 bg-[#0a0a0c] w-full py-16">
+                  <div className="max-w-[1920px] mx-auto px-12 grid grid-cols-1 lg:grid-cols-12 gap-16">
+                    <div className="lg:col-span-4">
+                      <div className="flex items-center gap-4 mb-6"><img src="https://i.ibb.co/d4HMs3Bm/image.png" className="h-12" /><span className="font-gaming text-4xl font-black italic">R2G</span></div>
+                      <p className="text-zinc-500 max-w-sm mb-8">Ultimate destination for Fortnite skins and case openings.</p>
+                      <div className="flex gap-4">
+                        {[Twitter, Instagram, Youtube, Send].map((Ic, i) => <button key={i} className="p-3 bg-white/5 rounded-xl text-zinc-500 hover:text-white"><Ic size={20} /></button>)}
+                      </div>
+                    </div>
+                    <div className="lg:col-span-5 grid grid-cols-2 sm:grid-cols-3 gap-12">
+                      {['Information', 'Legal', 'Support'].map(h => (
+                        <div key={h}>
+                          <h4 className="text-[11px] font-black text-zinc-600 mb-6 tracking-widest">{h}</h4>
+                          <ul className="space-y-4 text-zinc-500 text-sm font-bold"><li>LINK 1</li><li>LINK 2</li></ul>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="lg:col-span-3">
+                      <div className="p-6 bg-white/5 rounded-2xl border border-white/5 flex gap-4 items-center">
+                        <ShieldCheck className="text-green-500" /><div className="font-gaming font-black text-white italic">PROVABLY FAIR</div>
+                      </div>
+                    </div>
+                  </div>
+                </footer>
+              </div>
+            </main>
+          </div>
+        </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
